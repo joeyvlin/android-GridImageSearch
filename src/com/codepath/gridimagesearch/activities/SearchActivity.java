@@ -68,11 +68,13 @@ public class SearchActivity extends Activity {
 		// Link the adapter to the adapter view
 		gvResults.setAdapter(aImageResults);
 
+		// Set a scroll listner. 
 		System.out.println("setOnScrollListner");
 		gvResults.setOnScrollListener(new EndlessScrollListener() {
 
 			@Override
 			public void onLoadMore(int page, int totalItemsCount) {
+				// Pass in the offset for the next query (almost increase by 8 to get new items to add)
 				currentPage += RSZ;
 				executeQuery(currentPage);
 			}
@@ -99,7 +101,8 @@ public class SearchActivity extends Activity {
 	}
 	
 	public void onImageSearch(View v) {
-		imageResults.clear();  // only on initial search
+		imageResults.clear();  // Clear the grid view on new search
+		currentPage = 0;
 		executeQuery(currentPage);
 	}
 	
@@ -109,7 +112,7 @@ public class SearchActivity extends Activity {
 		if (query.length() <= 0) {
 			return;
 		}
-		AsyncHttpClient client = new AsyncHttpClient();//		String searchUrl = "https://ajax.googleapis.com/ajax/services/search/images?v=1.0&q=" + query + "&rsz=8";
+		AsyncHttpClient client = new AsyncHttpClient();//		
 		String searchUrl = "https://ajax.googleapis.com/ajax/services/search/images?rsz="+ RSZ + "&v=1.0&start=" + currentPage + "&q=" + Uri.encode(query); 
 		System.out.println(searchUrl);
 		client.get(searchUrl, new JsonHttpResponseHandler() {
@@ -122,7 +125,6 @@ public class SearchActivity extends Activity {
 					imageResultsJson = response.getJSONObject("responseData").getJSONArray("results");
 					// When you make changes to the adapter, underlying data is modified
 					aImageResults.addAll(ImageResult.fromJSONArray(imageResultsJson));
-//					aImageResults.notifyDataSetChanged();
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
