@@ -100,12 +100,15 @@ public class SearchActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 	
+	// When user click on the Search button
 	public void onImageSearch(View v) {
-		imageResults.clear();  // Clear the grid view on new search
+		// Clear the grid view on new search
+		imageResults.clear();  
 		currentPage = 0;
 		executeQuery(currentPage);
 	}
 	
+	// Method to fetch more images for Search button and scrolling
 	private void executeQuery(int currentPage) {
 		System.out.println("executeQuery");
 		query = etQuery.getText().toString();
