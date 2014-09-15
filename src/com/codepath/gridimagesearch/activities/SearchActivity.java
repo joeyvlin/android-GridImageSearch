@@ -21,17 +21,21 @@ import android.widget.EditText;
 import android.widget.GridView;
 
 import com.codepath.gridimagesearch.R;
+import com.codepath.gridimagesearch.SettingsActivity;
 import com.codepath.gridimagesearch.adapters.ImageResultsAdapter;
 import com.codepath.gridimagesearch.listeners.EndlessScrollListener;
 import com.codepath.gridimagesearch.models.ImageResult;
+import com.codepath.gridimagesearch.models.Settings;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 public class SearchActivity extends Activity {
-	public static int RSZ = 8;
+	private static int RSZ = 8;
+	private final int INTENT_CODE = 1000;
 	private int currentPage = 0;
 	private EditText etQuery;
 	private GridView gvResults;
+	private Settings settings;
 	private ArrayList<ImageResult> imageResults;
 	private ImageResultsAdapter aImageResults;
 	private String query;
@@ -41,6 +45,7 @@ public class SearchActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_search);
 		setupViews();
+		settings = new Settings();
 	}
 	
 	private void setupViews() {
@@ -95,9 +100,20 @@ public class SearchActivity extends Activity {
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
-			return true;
+			Intent i = new Intent();
+			i.setClass(this, SettingsActivity.class);
+			i.putExtra("settings", settings);
+			startActivityForResult(i, INTENT_CODE);
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		Log.d("DEBUG", "onActivityResult: " + data);
+		if (INTENT_CODE == requestCode) {
+			settings = data.getParcelableExtra("settings");
+		}
 	}
 	
 	// When user click on the Search button
@@ -116,7 +132,7 @@ public class SearchActivity extends Activity {
 			return;
 		}
 		AsyncHttpClient client = new AsyncHttpClient();//		
-		String searchUrl = "https://ajax.googleapis.com/ajax/services/search/images?rsz="+ RSZ + "&v=1.0&start=" + currentPage + "&q=" + Uri.encode(query); 
+		String searchUrl = "https://ajax.googleapis.com/ajax/services/search/images?rsz="+ RSZ + "&v=1.0&start=" + currentPage + "&q=" + Uri.encode(query) + settings.generateFilterQuery(); 
 		System.out.println(searchUrl);
 		client.get(searchUrl, new JsonHttpResponseHandler() {
 			@Override
