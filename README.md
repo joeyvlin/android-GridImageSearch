@@ -16,3 +16,5 @@ User Stories:
 
 Time spent: +/- 7 hours
 
+(gridimagesearch.gif)
+
